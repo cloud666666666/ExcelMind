@@ -52,8 +52,10 @@
             border: 1px solid #667eea30;
         }
 
-        [data-theme="light"] .message.user {
-            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        [data-theme="light"] .message.user .message-content {
+            background: linear-gradient(135deg, #f0f4ff 0%, #f5f3ff 100%);
+            color: #1e1b4b;
+            border: 1px solid #c7d2fe;
         }
 
         [data-theme="light"] .thinking-block {
@@ -1858,10 +1860,29 @@
             const theme = currentTheme === 'light' ? null : 'dark';
             chartInstances.forEach(item => {
                 if (item.chart && !item.chart.isDisposed()) {
-                    const option = item.chart.getOption();
+                    const originalOption = item.originalOption || item.chart.getOption();
                     item.chart.dispose();
                     const newChart = echarts.init(item.container, theme);
-                    newChart.setOption(option);
+
+                    // 应用主题相关的颜色覆盖
+                    let chartOptions = { ...originalOption };
+                    if (currentTheme === 'light') {
+                        chartOptions = {
+                            ...chartOptions,
+                            backgroundColor: '#ffffff',
+                            textStyle: { color: '#333333' },
+                            title: { ...chartOptions.title, textStyle: { color: '#1a1a2e' } },
+                            legend: { ...chartOptions.legend, textStyle: { color: '#4a4a68' } },
+                            xAxis: Array.isArray(chartOptions.xAxis)
+                                ? chartOptions.xAxis.map(x => ({ ...x, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' } }))
+                                : { ...chartOptions.xAxis, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' } },
+                            yAxis: Array.isArray(chartOptions.yAxis)
+                                ? chartOptions.yAxis.map(y => ({ ...y, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' }, splitLine: { lineStyle: { color: '#eee' } } }))
+                                : { ...chartOptions.yAxis, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' }, splitLine: { lineStyle: { color: '#eee' } } }
+                        };
+                    }
+
+                    newChart.setOption(chartOptions);
                     item.chart = newChart;
                 }
             });
@@ -2643,9 +2664,28 @@
                     if (container && typeof echarts !== 'undefined') {
                         const theme = currentTheme === 'light' ? null : 'dark';
                         const chart = echarts.init(container, theme);
-                        chart.setOption(result.chart);
+
+                        // 在亮色模式下覆盖一些选项以确保可读性
+                        let chartOptions = { ...result.chart };
+                        if (currentTheme === 'light') {
+                            chartOptions = {
+                                ...chartOptions,
+                                backgroundColor: '#ffffff',
+                                textStyle: { color: '#333333' },
+                                title: { ...chartOptions.title, textStyle: { color: '#1a1a2e' } },
+                                legend: { ...chartOptions.legend, textStyle: { color: '#4a4a68' } },
+                                xAxis: Array.isArray(chartOptions.xAxis)
+                                    ? chartOptions.xAxis.map(x => ({ ...x, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' } }))
+                                    : { ...chartOptions.xAxis, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' } },
+                                yAxis: Array.isArray(chartOptions.yAxis)
+                                    ? chartOptions.yAxis.map(y => ({ ...y, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' }, splitLine: { lineStyle: { color: '#eee' } } }))
+                                    : { ...chartOptions.yAxis, axisLine: { lineStyle: { color: '#ccc' } }, axisLabel: { color: '#666' }, splitLine: { lineStyle: { color: '#eee' } } }
+                            };
+                        }
+
+                        chart.setOption(chartOptions);
                         // 追踪图表实例以便主题切换时更新
-                        chartInstances.push({ chart, container });
+                        chartInstances.push({ chart, container, originalOption: result.chart });
                         // 响应式调整
                         const resizeObserver = new ResizeObserver(() => chart.resize());
                         resizeObserver.observe(container);

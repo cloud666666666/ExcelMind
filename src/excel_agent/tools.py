@@ -87,9 +87,11 @@ def filter_data(
     
     Args:
         column: 单条件筛选时的列名
-        operator: 单条件筛选时的比较运算符
+        operator: 比较运算符，仅支持: ==, !=, >, <, >=, <=, contains, startswith, endswith
+                  注意: 不支持 between/equals 等运算符，请用多个 >= 和 <= 条件代替 between
         value: 单条件筛选时的比较值（支持字符串、数值等任意类型）
         filters: 多条件筛选列表，每个元素为 {"column": "...", "operator": "...", "value": ...}
+                 operator 同样仅支持上述列出的运算符
         select_columns: 指定返回的列名列表，为空则返回所有列
         sort_by: 排序列名，可选
         ascending: 排序方向，True为升序，False为降序，默认True
@@ -145,6 +147,8 @@ def aggregate_data(
         column: 要统计的列名
         agg_func: 聚合函数，可选值: sum, mean, count, min, max, median, std
         filters: 可选的筛选条件列表，每个元素为 {"column": "...", "operator": "...", "value": ...}
+                 operator 仅支持: ==, !=, >, <, >=, <=, contains, startswith, endswith
+                 注意: 不支持 between/equals，用 >= 和 <= 组合代替
         
     Returns:
         统计结果
@@ -218,7 +222,7 @@ def group_and_aggregate(
         group_by: 分组列名
         agg_column: 要聚合的列名
         agg_func: 聚合函数，可选值: sum, mean, count, min, max
-        filters: 可选的筛选条件列表
+        filters: 可选的筛选条件列表，operator 仅支持: ==, !=, >, <, >=, <=, contains, startswith, endswith
         limit: 返回结果数量限制，默认20
         
     Returns:
@@ -478,7 +482,10 @@ def get_data_preview(n_rows: int = 10) -> Dict[str, Any]:
         数据预览
     """
     loader = get_loader()
-    return loader.get_preview(n_rows)
+    active_loader = loader.get_active_loader()
+    if active_loader is None:
+        return {"error": "没有活跃的表"}
+    return active_loader.get_preview(n_rows)
 
 
 @tool
@@ -563,7 +570,8 @@ def generate_chart(
         group_by: 分组列名（用于饼图和多系列图）
         agg_func: 聚合函数: sum, mean, count, min, max
         title: 图表标题
-        filters: 筛选条件列表
+        filters: 筛选条件列表，operator 仅支持: ==, !=, >, <, >=, <=, contains, startswith, endswith
+                 注意: 不支持 between/equals，请用 >= 和 <= 组合代替 between
         series_columns: 多系列Y轴列名列表
         limit: 数据点数量限制，默认20
         
