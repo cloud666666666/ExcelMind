@@ -1,6 +1,10 @@
-# ExcelMind 📊
+# 📊 ExcelMind - Excel 数据智能分析助手
 
-基于 LangGraph 的 **Excel 数据智能分析助手**，支持自然语言查询、多轮对话、流式输出、**ECharts 图表可视化**和可视化思考过程。
+> 基于 LangGraph 的智能化 Excel 数据分析工具，让自然语言成为你的数据分析利器！
+
+## 📋 项目简介
+
+ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解自然语言并智能分析数据。支持多轮对话、流式输出、ECharts 图表可视化和完整的思考过程展示，让数据分析变得简单直观。
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -13,181 +17,53 @@
 
 > 视频展示了 ExcelMind 的核心功能：自然语言查询、智能联表、知识库检索等
 
-## ✨ 功能亮点
+## ✨ 主要功能
 
-### 🎯 核心能力
-- **自然语言查询**: 用中文直接提问，无需编写代码或公式
-- **多轮对话**: 支持上下文关联的连续追问（如"和上个月相比呢？"）
-- **流式输出**: 实时显示 AI 思考过程和回答，响应更流畅
-- **智能工具调用**: 自动选择合适的数据分析工具，展示完整推理链路
+### 🎯 核心功能
 
-### 🛠️ 丰富的数据分析工具
-| 工具 | 功能 | 特性 |
-|------|------|------|
-| `filter_data` | 筛选+排序 | 支持多条件 AND、排序、指定返回列 |
-| `aggregate_data` | 聚合统计 | 支持先筛选再聚合 |
-| `group_and_aggregate` | 分组聚合 | 支持筛选后分组 |
-| `search_data` | 关键词搜索 | 可限制搜索范围 |
-| `get_column_stats` | 列统计 | 支持筛选后统计 |
-| `get_unique_values` | 唯一值 | 支持筛选后获取 |
-| `get_data_preview` | 数据预览 | 快速查看数据 |
-| `get_current_time` | 获取时间 | 处理相对时间查询 |
-| `calculate` | 数学计算 | 批量精确计算 |
-| `generate_chart` | **图表生成** | ECharts 可视化，AI 自动推荐图表类型 |
+- **自然语言查询** - 用中文直接提问，无需编写代码或公式
+- **多轮对话** - 支持上下文关联的连续追问（如"和上个月相比呢？"）
+- **流式输出** - 实时显示 AI 思考过程和回答，响应更流畅
+- **智能工具调用** - 自动选择合适的数据分析工具，展示完整推理链路
 
-### 🔄 多表协同
-- **多表管理**: 同时上传和管理多个 Excel 表格
-- **智能联表**: AI 自动分析表结构，通过 `🤖 智能联表` 功能一键生成连接建议
-- **灵活连接**: 支持多字段（复合键）连接，以及 Inner/Left/Right/Outer 等多种连接方式
-- **上下文感知**: 对话时明确显示当前所在的表格上下文
+### 🛠️ 数据分析工具
 
-### 📚 本地知识库
-- **私有知识存储**: 存储业务规则、字段说明、操作指南等私有知识
-- **向量检索**: 基于 Chroma 向量数据库，使用 Embedding 模型进行语义检索
-- **智能召回**: 对话时自动检索相关知识，注入到 Prompt 提升回答质量
-- **Web 管理**: 右侧面板可视化管理知识条目，支持增删改查和文件上传
-- **持久化存储**: 知识向量化后自动持久化，重启不丢失
+- **数据筛选** - 多条件筛选、排序、指定返回列
+- **聚合统计** - 支持先筛选再聚合
+- **分组聚合** - 灵活的分组统计功能
+- **关键词搜索** - 可限制搜索范围
+- **列统计** - 支持筛选后统计
+- **唯一值获取** - 支持筛选后获取
+- **数据预览** - 快速查看数据结构
+- **时间获取** - 处理相对时间查询
+- **数学计算** - 批量精确计算
+- **图表生成** - ECharts 可视化，AI 自动推荐图表类型
 
-### 📈 ECharts 图表可视化 (NEW)
-- **多图表类型**: 支持柱状图、折线图、饼图、散点图、雷达图、漏斗图
-- **AI 自动推荐**: 根据数据特征智能推荐最合适的图表类型
-- **交互式图表**: 基于 ECharts 5.5，支持悬停提示、图例切换、响应式布局
-- **自然语言触发**: 直接说"帮我画个图表"或"可视化销售数据"即可生成
+### 🔧 高级特性
 
-### 🦺 现代化 Web 界面
-- **双主题模式**: 支持亮色/暗色主题一键切换，自动记忆用户偏好
-- **侧边栏管理**: 清晰的表格列表和操作入口
-- **拖拽上传**: 支持多文件拖拽上传，带进度提示
-- **实时预览**: 上传后即时显示数据结构和预览
-- **思考可视化**: 展示 AI 的推理过程（Chain of Thought）
-- **工具调用展示**: 透明显示每一步工具调用和结果（美化版）
-- **Markdown 渲染**: 完美支持表格、代码块等格式
+- **多表协同** - 同时管理多个 Excel 表格，支持智能联表
+- **本地知识库** - 基于 Chroma 向量数据库的私有知识存储
+- **双主题模式** - 亮色/暗色主题一键切换
+- **意图过滤** - 自动拒绝与数据无关的闲聊
 
-### 🛡️ 安全与稳定
-- **意图过滤**: 自动拒绝与 Excel 数据无关的闲聊
-- **类型兼容**: 工具参数支持多种数据类型（字符串、数值、日期）
-- **模糊匹配**: 日期字段支持前缀匹配（如 "202511" 匹配 "20251104"）
-- **高迭代限制**: 支持复杂任务的多步推理（最多 50 次工具调用）
-
-## 🚀 快速开始
-
-### 环境要求
-- Python 3.11+
-- [uv](https://github.com/astral-sh/uv) (推荐) 或 pip
-
-### 1. 克隆项目
-
-```bash
-git clone https://github.com/stark-456/ExcelMind.git
-cd ExcelMind
-```
-
-### 2. 安装依赖
-
-```bash
-# 使用 uv (推荐)
-uv sync
-
-# 或使用 pip
-pip install -e .
-```
-
-### 3. 配置
-
-编辑 `config.yaml` 配置模型参数：
-
-```yaml
-model:
-  provider: "openai"
-  model_name: "gpt-4"  # 或其他兼容模型
-  api_key: "your-api-key"
-  base_url: "https://api.openai.com/v1"  # 可选，自定义端点
-  temperature: 0.1
-  max_tokens: 4096
-
-excel:
-  max_preview_rows: 20
-  default_result_limit: 20
-  max_result_limit: 1000
-
-server:
-  host: "0.0.0.0"
-  port: 8000
-```
-
-也可使用环境变量：
-
-```bash
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_BASE_URL="your-api-base-url"
-```
-
-### 4. 启动服务
-
-```bash
-# Web 服务模式（推荐）
-uv run python -m excel_agent.main serve
-
-# 命令行模式
-uv run python -m excel_agent.main cli --excel your_file.xlsx
-```
-
-### 5. 使用
-
-打开浏览器访问 `http://localhost:8000`：
-1. 拖拽或点击上传 Excel 文件
-2. 在聊天框输入自然语言问题
-3. 查看 AI 的思考过程和分析结果
-
-## 📡 API 接口
-
-启动服务后访问 `http://localhost:8000/docs` 查看完整 Swagger 文档。
-
-### 主要接口
-
-| 接口 | 方法 | 描述 |
-|------|------|------|
-| `/` | GET | Web 界面 |
-| `/upload` | POST | 上传 Excel 文件 |
-| `/load` | POST | 通过路径加载 Excel |
-| `/chat/stream` | POST | 流式对话（推荐） |
-| `/chat` | POST | 非流式对话 |
-| `/status` | GET | 获取当前状态 |
-| `/reset` | POST | 重置 Agent |
-
-### 请求示例
-
-```bash
-# 上传 Excel
-curl -X POST "http://localhost:8000/upload" \
-  -F "file=@your_file.xlsx"
-
-# 流式对话（带历史）
-curl -X POST "http://localhost:8000/chat/stream" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "message": "2025年11月西城分公司的移动新增用户是多少？",
-    "history": [
-      {"role": "user", "content": "这个表有哪些列？"},
-      {"role": "assistant", "content": "该表包含以下列：账期、分公司名称、..."}
-    ]
-  }'
-```
-
-## 🏗️ 项目结构
+## 📁 文件结构
 
 ```
-Excel_Agent/
-├── config.yaml              # 配置文件
+ExcelMind/
+├── config.yaml              # 配置文件（需从 config.example.yaml 复制）
+├── config.example.yaml      # 配置文件模板
 ├── pyproject.toml           # 项目依赖
-├── README.md
+├── README.md                # 使用说明
+├── LICENSE                  # MIT许可证
 ├── knowledge/               # 知识库文件目录
 │   └── *.md                 # Markdown 格式知识文件
 ├── .vector_db/              # Chroma 向量数据库（自动生成）
+├── docs/                    # 文档目录
+│   └── card.png             # 社区交流名片
 └── src/
     └── excel_agent/
         ├── __init__.py
-        ├── main.py          # 入口
+        ├── main.py          # 程序入口
         ├── api.py           # FastAPI 接口
         ├── config.py        # 配置管理
         ├── excel_loader.py  # Excel 加载器
@@ -200,36 +76,121 @@ Excel_Agent/
             └── index.html   # Web 界面
 ```
 
-## 🐳 Docker 部署
+## 🚀 快速开始
 
-```dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY . .
-RUN pip install uv && uv sync
-EXPOSE 8000
-CMD ["uv", "run", "python", "-m", "excel_agent.main", "serve"]
+### 系统要求
+
+- **Python版本**：3.11+
+- **包管理器**：[uv](https://github.com/astral-sh/uv)（推荐）或 pip
+- **API Key**：OpenAI 兼容的 API Key
+
+### 安装步骤
+
+1. **克隆项目**：
+
+   ```bash
+   git clone https://github.com/cloud666666666/ExcelMind.git
+   cd ExcelMind
+   ```
+2. **安装依赖**：
+
+   ```bash
+   # 使用 uv（推荐）
+   uv sync
+
+   # 或使用 pip
+   pip install -e .
+   ```
+3. **配置文件**：
+
+   ```bash
+   # 复制配置模板
+   cp config.example.yaml config.yaml
+
+   # 编辑配置文件，填入 API Key
+   ```
+4. **启动服务**：
+
+   ```bash
+   # Web 服务模式（推荐）
+   uv run python -m excel_agent.main serve
+
+   # 命令行模式
+   uv run python -m excel_agent.main cli --excel your_file.xlsx
+   ```
+5. **开始使用**：
+   打开浏览器访问 `http://localhost:8000`
+
+## ⚙️ 配置说明
+
+### 配置文件模板
+
+```yaml
+model:
+  # 当前使用的提供商
+  provider: "openai"
+
+  # 各提供商配置
+  providers:
+    openai:
+      provider: "openai"
+      model_name: "gpt-4"
+      api_key: "${OPENAI_API_KEY}"
+      base_url: "https://api.openai.com/v1"
+      temperature: 0.1
+      max_tokens: 4096
+      fallback_models:
+        - "gpt-3.5-turbo"
+
+excel:
+  max_preview_rows: 20
+  default_result_limit: 20
+  max_result_limit: 1000
+
+server:
+  host: "0.0.0.0"
+  port: 8000
 ```
+
+### 环境变量
+
+也可使用环境变量配置：
 
 ```bash
-docker build -t excel-agent .
-docker run -p 8000:8000 -e OPENAI_API_KEY=your-key excel-agent
+export OPENAI_API_KEY="your-api-key"
+export OPENAI_BASE_URL="your-api-base-url"
 ```
 
-## 🔧 开发
+### 配置参数说明
 
-```bash
-# 安装开发依赖
-uv sync --dev
+| 参数                | 说明             | 示例                          |
+| ------------------- | ---------------- | ----------------------------- |
+| `provider`        | 使用的模型提供商 | `openai`                    |
+| `model_name`      | 模型名称         | `gpt-4`                     |
+| `api_key`         | API 密钥         | `sk-xxx`                    |
+| `base_url`        | API 端点（可选） | `https://api.openai.com/v1` |
+| `temperature`     | 温度参数         | `0.1`                       |
+| `max_tokens`      | 最大 token 数    | `4096`                      |
+| `fallback_models` | 降级模型列表     | `["gpt-3.5-turbo"]`         |
 
-# 运行测试（如有）
-uv run pytest
+## 🎮 使用指南
 
-# 代码格式化
-uv run ruff format .
-```
+### 1. 上传文件
 
-## 📝 使用示例
+- 拖拽 Excel 文件到页面
+- 或点击上传区域选择文件
+- 支持同时上传多个文件
+
+### 2. 开始对话
+
+在聊天框输入自然语言问题，例如：
+
+- "这个表有多少行数据？"
+- "按分公司统计销售总额"
+- "帮我画个饼图展示各部门占比"
+- "2024年11月的数据明细"
+
+### 3. 使用示例
 
 ```
 用户：这个表有多少行数据？
@@ -254,9 +215,157 @@ uv run ruff format .
       [交互式 ECharts 饼图显示]
 ```
 
-## 🤝 贡献
+## 📡 API 接口
 
-欢迎提交 Issue 和 Pull Request！
+启动服务后访问 `http://localhost:8000/docs` 查看完整 Swagger 文档。
+
+### 主要接口
+
+| 接口             | 方法 | 描述               |
+| ---------------- | ---- | ------------------ |
+| `/`            | GET  | Web 界面           |
+| `/upload`      | POST | 上传 Excel 文件    |
+| `/load`        | POST | 通过路径加载 Excel |
+| `/chat/stream` | POST | 流式对话（推荐）   |
+| `/chat`        | POST | 非流式对话         |
+| `/status`      | GET  | 获取当前状态       |
+| `/reset`       | POST | 重置 Agent         |
+
+### 请求示例
+
+```bash
+# 上传 Excel
+curl -X POST "http://localhost:8000/upload" \
+  -F "file=@your_file.xlsx"
+
+# 流式对话
+curl -X POST "http://localhost:8000/chat/stream" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "按部门统计销售额",
+    "history": []
+  }'
+```
+
+## 🔧 常见问题与解决方案
+
+### Q1: 程序无法启动
+
+**A: 环境问题**
+
+- ✅ 确保 Python 版本 >= 3.11
+- ✅ 确保已正确安装依赖：`uv sync` 或 `pip install -e .`
+- ✅ 确保 `config.yaml` 文件存在且配置正确
+
+### Q2: API 调用失败
+
+**A: 配置问题**
+
+- ✅ 检查 `api_key` 是否正确
+- ✅ 检查 `base_url` 是否可访问
+- ✅ 检查网络代理设置
+
+### Q3: Excel 文件上传失败
+
+**A: 文件问题**
+
+- ✅ 确保文件格式为 `.xlsx` 或 `.xls`
+- ✅ 检查文件是否损坏
+- ✅ 检查文件大小是否过大
+
+### Q4: 图表不显示
+
+**A: 浏览器问题**
+
+- ✅ 使用现代浏览器（Chrome、Firefox、Edge）
+- ✅ 检查浏览器控制台是否有错误
+
+### Q5: 多表联接失败
+
+**A: 数据问题**
+
+- ✅ 确保关联字段数据类型一致
+- ✅ 检查字段名称是否正确
+
+## 🐳 Docker 部署
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY . .
+RUN pip install uv && uv sync
+EXPOSE 8000
+CMD ["uv", "run", "python", "-m", "excel_agent.main", "serve"]
+```
+
+```bash
+docker build -t excel-mind .
+docker run -p 8000:8000 -e OPENAI_API_KEY=your-key excel-mind
+```
+
+## 🛠️ 开发说明
+
+### 技术栈
+
+- **Python 3.11** - 主要开发语言
+- **LangGraph** - Agent 工作流框架
+- **LangChain** - LLM 应用框架
+- **FastAPI** - Web 服务框架
+- **Pandas** - 数据处理
+- **Chroma** - 向量数据库
+- **ECharts** - 图表可视化
+
+### 开发环境设置
+
+```bash
+# 安装开发依赖
+uv sync --dev
+
+# 运行测试
+uv run pytest
+
+# 代码格式化
+uv run ruff format .
+```
+
+## 📝 更新日志
+
+### v1.2.0 (当前版本)
+
+- ✅ 新增 Anthropic 原生 API 支持
+- ✅ 新增降级模型（fallback_models）配置
+- ✅ 优化流式输出逻辑
+- ✅ 更新依赖版本
+
+### v1.1.0
+
+- ✅ 迁移到 LangChain ReAct Agent
+- ✅ 实现真正的流式输出
+- ✅ 添加可折叠思考过程
+- ✅ 修复工具描述和亮色模式 UI
+
+### v1.0.0
+
+- ✅ 基础 Excel 数据分析功能
+- ✅ 自然语言查询
+- ✅ 多轮对话支持
+- ✅ ECharts 图表可视化
+- ✅ 本地知识库
+
+## 🤝 技术支持
+
+如果遇到问题：
+
+1. 检查配置文件是否正确
+2. 查看控制台输出的错误信息
+3. 提交 Issue 到 GitHub 仓库
+
+## 📄 免责声明
+
+- 本工具仅供学习和个人使用
+- 请勿将敏感数据上传至公网部署的服务
+- 作者不对因使用本工具导致的任何数据泄露负责
+- AI 分析结果仅供参考，请自行验证重要数据
 
 ## 📄 License
 
@@ -264,9 +373,6 @@ uv run ruff format .
 
 ---
 
-**Made with ❤️ using LangGraph, FastAPI, and OpenAI**
+**📊 让数据分析变得简单！**
 
-## 💬 社区交流
-
-![QQ群名片](docs/card.png)
-
+> 💡 提示：首次使用建议查看演示视频，快速了解各项功能。
