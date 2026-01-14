@@ -4,6 +4,7 @@ from typing import Annotated, Any, Dict, List, Literal, TypedDict
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langgraph.graph import END, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
@@ -23,13 +24,24 @@ def get_llm():
     """获取 LLM 实例"""
     config = get_config()
     provider = config.model.get_active_provider()
-    return ChatOpenAI(
-        model=provider.model_name,
-        api_key=provider.api_key,
-        base_url=provider.base_url if provider.base_url else None,
-        temperature=provider.temperature,
-        max_tokens=provider.max_tokens,
-    )
+
+    if provider.provider == "anthropic":
+        return ChatAnthropic(
+            model=provider.model_name,
+            api_key=provider.api_key,
+            base_url=provider.base_url.rstrip('/') if provider.base_url else None,
+            temperature=provider.temperature,
+            max_tokens=provider.max_tokens,
+        )
+    else:
+        # 默认使用 OpenAI 兼容接口
+        return ChatOpenAI(
+            model=provider.model_name,
+            api_key=provider.api_key,
+            base_url=provider.base_url if provider.base_url else None,
+            temperature=provider.temperature,
+            max_tokens=provider.max_tokens,
+        )
 
 
 def agent_node(state: AgentState) -> AgentState:

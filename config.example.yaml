@@ -17,6 +17,9 @@ model:
       base_url: "${SELF_HOSTED_BASE_URL}"
       temperature: 0.1
       max_tokens: 4096
+      fallback_models:
+        - "claude-3-5-haiku-20241022"
+        - "gemini-2.5-pro"  
     
     # x666 服务
     x666:

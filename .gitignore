@@ -25,9 +25,13 @@ wheels/
 venv/
 ENV/
 env/
+.conda/
 
 # uv
 .uv/
+
+# Claude
+.claude/
 
 # IDE
 .idea/

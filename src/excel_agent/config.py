@@ -3,7 +3,7 @@
 import os
 import re
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 import yaml
 from pydantic import BaseModel, Field
@@ -18,6 +18,7 @@ class ProviderConfig(BaseModel):
     temperature: float = 0.1
     max_tokens: int = 4096
     description: Optional[str] = None  # 可选的渠道描述
+    fallback_models: Optional[List[str]] = None  # 降级模型列表
 
 
 class ModelConfig(BaseModel):
