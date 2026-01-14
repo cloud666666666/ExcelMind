@@ -6,6 +6,8 @@
 
 ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解自然语言并智能分析数据。支持多轮对话、流式输出、ECharts 图表可视化和完整的思考过程展示，让数据分析变得简单直观。
 
+> 🔱 **Fork 声明**：本项目基于 [Gen-Future/ExcelMind](https://github.com/Gen-Future/ExcelMind) 进行二次开发，新增了 **Claude 系列模型原生适配** 以及 **模型调用失败的容错降级机制**。
+
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Latest-009688)
@@ -359,6 +361,35 @@ uv run ruff format .
 1. 检查配置文件是否正确
 2. 查看控制台输出的错误信息
 3. 提交 Issue 到 GitHub 仓库
+
+## ☕ 赞赏支持
+
+如果这个项目对您有帮助，欢迎请作者喝杯咖啡☕
+
+**您的支持就是作者开发和维护项目的动力🚀**
+
+### 微信赞赏码
+
+![微信赞赏码](./docs/wechat_reward.jpg)
+
+*扫码支持开发者，您的每一份心意都是我们前进的动力！*
+
+## 📞 联系作者
+
+### 💡 功能建议与合作需求
+
+如果您有以下需求，欢迎联系作者：
+
+- 🚀 **新功能建议** - 希望添加特定功能
+- 🤝 **商业合作** - 定制开发需求
+- 🛠️ **技术支持** - 专业问题解答
+- 💼 **项目合作** - 相关项目合作机会
+
+### 📱 联系方式
+
+**微信号：** `wyh2353493891`
+
+*添加微信时请备注：ExcelMind项目咨询*
 
 ## 📄 免责声明
 
