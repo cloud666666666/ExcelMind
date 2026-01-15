@@ -16,6 +16,7 @@ ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解�
 ## 🎬 演示视频
 
 [![ExcelMind 演示视频](https://img.shields.io/badge/📺_点击观看-Bilibili视频-00A1D6?style=for-the-badge&logo=bilibili)](https://www.bilibili.com/video/BV1VKvWBgEF1/)
+[![本地视频](https://img.shields.io/badge/📁_本地视频-点击下载-green?style=for-the-badge)](./docs/演示视频.mp4)
 
 > 视频展示了 ExcelMind 的核心功能：自然语言查询、智能联表、知识库检索等
 
