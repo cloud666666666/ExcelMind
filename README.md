@@ -6,7 +6,7 @@
 
 ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解自然语言并智能分析数据。支持多轮对话、流式输出、ECharts 图表可视化和完整的思考过程展示，让数据分析变得简单直观。
 
-> 🔱 **Fork 声明**：本项目基于 [Gen-Future/ExcelMind](https://github.com/Gen-Future/ExcelMind) 进行二次开发，新增了 **Claude 系列模型原生适配** 以及 **模型调用失败的容错降级机制**。
+> 🔱 **Fork 声明**：本项目基于 [Gen-Future/ExcelMind](https://github.com/Gen-Future/ExcelMind) 进行二次开发，新增了 **Claude 系列模型原生适配**、**模型调用失败的容错降级机制** 以及 **v2.0 写入能力**。
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -43,12 +43,34 @@ ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解�
 - **数学计算** - 批量精确计算
 - **图表生成** - ECharts 可视化，AI 自动推荐图表类型
 
+### ✏️ 数据写入工具 (v2.0 新增)
+
+- **单元格写入** - 写入单个单元格的值
+- **批量写入** - 写入指定范围的数据
+- **公式写入** - 写入 Excel 公式（如 `=SUM(A1:A10)`）
+- **公式读取** - 读取单元格的公式
+- **行操作** - 插入、删除行
+- **文件保存** - 保存到副本或原始文件
+- **文件导出** - 导出到指定位置或浏览器下载
+
+### 🎨 格式化工具 (v2.0 新增)
+
+- **字体设置** - 字体名称、大小、加粗、斜体、颜色
+- **背景填充** - 单元格背景色设置
+- **对齐方式** - 水平/垂直对齐、自动换行
+- **边框设置** - 边框样式、颜色
+- **数字格式** - 千分位、百分比、日期、货币等
+- **合并单元格** - 合并/取消合并单元格
+- **行高列宽** - 设置行高、列宽、自动调整
+
 ### 🔧 高级特性
 
 - **多表协同** - 同时管理多个 Excel 表格，支持智能联表
 - **本地知识库** - 基于 Chroma 向量数据库的私有知识存储
 - **双主题模式** - 亮色/暗色主题一键切换
 - **意图过滤** - 自动拒绝与数据无关的闲聊
+- **双引擎架构** - pandas（分析）+ openpyxl（写入），各司其职
+- **文件下载** - 浏览器下载修改后的文件，不影响原始文件
 
 ## 📁 文件结构
 
@@ -63,19 +85,21 @@ ExcelMind/
 │   └── *.md                 # Markdown 格式知识文件
 ├── .vector_db/              # Chroma 向量数据库（自动生成）
 ├── docs/                    # 文档目录
-│   └── card.png             # 社区交流名片
+│   ├── card.png             # 社区交流名片
+│   └── BLUEPRINT_v2.md      # v2.0 技术蓝图
 └── src/
     └── excel_agent/
         ├── __init__.py
         ├── main.py          # 程序入口
         ├── api.py           # FastAPI 接口
         ├── config.py        # 配置管理
-        ├── excel_loader.py  # Excel 加载器
-        ├── graph.py         # LangGraph 工作流
+        ├── excel_loader.py  # Excel 加载器（多表管理）
+        ├── excel_document.py # Excel 文档类（双引擎）
         ├── knowledge_base.py # 知识库管理
-        ├── prompts.py       # 提示词模板
+        ├── skill_manager.py  # 技能管理器
+        ├── skills.py         # 内置技能定义
         ├── stream.py        # 流式对话核心
-        ├── tools.py         # 数据分析工具
+        ├── tools.py         # 数据分析工具（含写入和格式化）
         └── frontend/
             └── index.html   # Web 界面
 ```
@@ -132,27 +156,27 @@ ExcelMind/
 ```yaml
 model:
   # 当前使用的提供商
-  provider: "openai"
+  active: "self_hosted"
 
   # 各提供商配置
   providers:
-    openai:
-      provider: "openai"
-      model_name: "gpt-4"
-      api_key: "${OPENAI_API_KEY}"
-      base_url: "https://api.openai.com/v1"
+    self_hosted:
+      provider: "anthropic"
+      model_name: "claude-3-5-haiku-20241022"
+      api_key: "your-api-key"
+      base_url: "https://your-api-endpoint"
       temperature: 0.1
-      max_tokens: 4096
+      max_tokens: 8192
       fallback_models:
-        - "gpt-3.5-turbo"
+        - "gemini-2.5-pro"
 
 excel:
-  max_preview_rows: 20
-  default_result_limit: 20
+  max_preview_rows: 200
+  default_result_limit: 200
   max_result_limit: 1000
 
 server:
-  host: "0.0.0.0"
+  host: "127.0.0.1"
   port: 8000
 ```
 
@@ -169,13 +193,13 @@ export OPENAI_BASE_URL="your-api-base-url"
 
 | 参数                | 说明             | 示例                          |
 | ------------------- | ---------------- | ----------------------------- |
-| `provider`        | 使用的模型提供商 | `openai`                    |
-| `model_name`      | 模型名称         | `gpt-4`                     |
+| `active`          | 使用的模型提供商 | `self_hosted`               |
+| `model_name`      | 模型名称         | `claude-3-5-haiku-20241022` |
 | `api_key`         | API 密钥         | `sk-xxx`                    |
 | `base_url`        | API 端点（可选） | `https://api.openai.com/v1` |
 | `temperature`     | 温度参数         | `0.1`                       |
-| `max_tokens`      | 最大 token 数    | `4096`                      |
-| `fallback_models` | 降级模型列表     | `["gpt-3.5-turbo"]`         |
+| `max_tokens`      | 最大 token 数    | `8192`                      |
+| `fallback_models` | 降级模型列表     | `["gemini-2.5-pro"]`        |
 
 ## 🎮 使用指南
 
@@ -194,7 +218,23 @@ export OPENAI_BASE_URL="your-api-base-url"
 - "帮我画个饼图展示各部门占比"
 - "2024年11月的数据明细"
 
-### 3. 使用示例
+### 3. 数据修改 (v2.0 新增)
+
+v2.0 支持通过自然语言修改 Excel 数据：
+
+- "把 A1 单元格写入 100"
+- "在 B1 写入求和公式 =SUM(A1:A10)"
+- "把标题行加粗"
+- "给表格添加边框"
+- "设置 A 列背景为黄色"
+
+### 4. 下载文件
+
+修改完成后，点击页面左侧的「下载文件」按钮，即可下载修改后的 Excel 文件。
+
+> **注意**：所有修改操作默认保存到工作副本，不会影响原始文件。
+
+### 5. 使用示例
 
 ```
 用户：这个表有多少行数据？
@@ -209,14 +249,10 @@ export OPENAI_BASE_URL="your-api-base-url"
       | 西城   | 38,901      |
       | ...    | ...         |
 
-用户：西城的明细呢？
-助手：[理解上下文，调用 filter_data]
-      西城分公司的详细数据如下：...
-
-用户：用饼图展示各分公司的占比
-助手：[调用 generate_chart 工具]
-      📊 已生成饼图，共 8 个数据点。
-      [交互式 ECharts 饼图显示]
+用户：把这个统计结果写入到新的一行
+助手：[调用 write_range 工具]
+      已将统计结果写入到工作表中。
+      您可以点击「下载文件」按钮获取修改后的文件。
 ```
 
 ## 📡 API 接口
@@ -232,6 +268,7 @@ export OPENAI_BASE_URL="your-api-base-url"
 | `/load`        | POST | 通过路径加载 Excel |
 | `/chat/stream` | POST | 流式对话（推荐）   |
 | `/chat`        | POST | 非流式对话         |
+| `/download`    | GET  | 下载修改后的文件   |
 | `/status`      | GET  | 获取当前状态       |
 | `/reset`       | POST | 重置 Agent         |
 
@@ -249,6 +286,9 @@ curl -X POST "http://localhost:8000/chat/stream" \
     "message": "按部门统计销售额",
     "history": []
   }'
+
+# 下载修改后的文件
+curl -O "http://localhost:8000/download"
 ```
 
 ## 🔧 常见问题与解决方案
@@ -284,12 +324,13 @@ curl -X POST "http://localhost:8000/chat/stream" \
 - ✅ 使用现代浏览器（Chrome、Firefox、Edge）
 - ✅ 检查浏览器控制台是否有错误
 
-### Q5: 多表联接失败
+### Q5: 修改后的文件在哪里？
 
-**A: 数据问题**
+**A: 下载文件**
 
-- ✅ 确保关联字段数据类型一致
-- ✅ 检查字段名称是否正确
+- ✅ 点击页面左侧的「下载文件」按钮
+- ✅ 浏览器会自动下载修改后的 Excel 文件
+- ✅ 原始文件不会被修改
 
 ## 🐳 Docker 部署
 
@@ -315,7 +356,8 @@ docker run -p 8000:8000 -e OPENAI_API_KEY=your-key excel-mind
 - **LangGraph** - Agent 工作流框架
 - **LangChain** - LLM 应用框架
 - **FastAPI** - Web 服务框架
-- **Pandas** - 数据处理
+- **Pandas** - 数据分析引擎
+- **openpyxl** - Excel 写入引擎
 - **Chroma** - 向量数据库
 - **ECharts** - 图表可视化
 
@@ -334,7 +376,18 @@ uv run ruff format .
 
 ## 📝 更新日志
 
-### v1.3.0 (当前版本)
+### v2.0.0 (当前版本)
+
+- ✅ **双引擎架构**: pandas（分析）+ openpyxl（写入）
+- ✅ **写入能力**: 单元格写入、批量写入、公式写入
+- ✅ **格式化工具**: 字体、背景、边框、对齐、数字格式
+- ✅ **合并单元格**: 合并/取消合并单元格
+- ✅ **行高列宽**: 设置行高、列宽、自动调整
+- ✅ **文件下载**: 浏览器下载修改后的文件
+- ✅ **Skills 架构**: 技能管理器和内置技能定义
+- ✅ **状态管理**: processing/idle 状态事件
+
+### v1.3.0
 
 - ✅ 新增工作表切换功能（switch_sheet）
 - ✅ 修复 LangGraph 递归限制问题

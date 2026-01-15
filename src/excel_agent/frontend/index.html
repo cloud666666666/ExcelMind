@@ -433,7 +433,7 @@
         }
 
         .btn-join {
-            width: 100%;
+            flex: 1;
             padding: 10px 16px;
             background: var(--gradient-2);
             border: none;
@@ -453,10 +453,38 @@
             transform: scale(1.02);
         }
 
+        .btn-download {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-download:disabled,
         .btn-join:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .join-btn-container {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
         }
 
         /* Modal */
@@ -1639,6 +1667,9 @@
                 <button class="btn-join" id="btn-join" disabled>
                     🤖 智能联表
                 </button>
+                <button class="btn-download" id="btn-download" disabled title="下载修改后的文件">
+                    💾 下载文件
+                </button>
             </div>
         </div>
     </aside>
@@ -1811,6 +1842,7 @@
         const sendBtn = document.getElementById('send-btn');
         const btnClearAll = document.getElementById('btn-clear-all');
         const btnJoin = document.getElementById('btn-join');
+        const btnDownload = document.getElementById('btn-download');
         const joinModal = document.getElementById('join-modal');
         const modalClose = document.getElementById('modal-close');
         const joinCancel = document.getElementById('join-cancel');
@@ -2042,7 +2074,57 @@
                     ? '🤖 智能联表 (选择2张表)'
                     : `🤖 智能联表 (已选${selectedTableIds.length}/2)`;
             }
+
+            // 更新下载按钮状态：有表加载时启用
+            btnDownload.disabled = tables.length === 0;
         }
+
+        // 下载按钮事件
+        btnDownload.addEventListener('click', async () => {
+            try {
+                btnDownload.disabled = true;
+                btnDownload.innerHTML = '⏳ 准备中...';
+
+                // 触发浏览器下载
+                const response = await fetch('/download');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || '下载失败');
+                }
+
+                // 获取文件名
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'download.xlsx';
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename\*?=['"]?(?:UTF-8'')?([^;\n"']+)/i);
+                    if (match) {
+                        filename = decodeURIComponent(match[1]);
+                    }
+                }
+
+                // 创建下载链接
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                btnDownload.innerHTML = '✅ 已下载';
+                setTimeout(() => {
+                    btnDownload.innerHTML = '💾 下载文件';
+                    btnDownload.disabled = tables.length === 0;
+                }, 2000);
+            } catch (error) {
+                console.error('Download error:', error);
+                alert('下载失败: ' + error.message);
+                btnDownload.innerHTML = '💾 下载文件';
+                btnDownload.disabled = tables.length === 0;
+            }
+        });
 
         // Join Modal
         btnJoin.addEventListener('click', openJoinModal);

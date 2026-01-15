@@ -1,7 +1,7 @@
 [project]
 name = "excel-agent"
-version = "0.1.0"
-description = "Excel 智能问数 Agent - 基于 LangGraph 的 Excel 数据分析助手"
+version = "2.0.0"
+description = "Excel 智能问数 Agent - 基于 LangGraph 的 Excel 数据分析助手，支持双引擎读写"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

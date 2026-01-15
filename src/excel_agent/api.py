@@ -482,6 +482,78 @@ async def chat_stream(request: ChatRequest):
     )
 
 
+@app.get("/download")
+async def download_file(table_id: Optional[str] = None):
+    """下载当前修改后的 Excel 文件
+
+    以浏览器下载的方式返回文件，用户可以自己选择保存位置。
+    """
+    loader = get_loader()
+
+    if not loader.is_loaded:
+        raise HTTPException(status_code=400, detail="请先加载 Excel 文件")
+
+    # 获取指定表或当前活跃表
+    target_table_id = table_id or loader.active_table_id
+    if not target_table_id:
+        raise HTTPException(status_code=400, detail="未指定表ID且无活跃表")
+
+    # 获取表信息
+    table_info = loader.get_table_info(target_table_id)
+    if not table_info:
+        raise HTTPException(status_code=404, detail=f"表不存在: {target_table_id}")
+
+    # 检查是否支持导出（需要双引擎模式）
+    if not table_info.use_dual_engine:
+        raise HTTPException(status_code=400, detail="当前表不支持导出操作（需要双引擎模式）")
+
+    # 获取文档并保存到临时文件
+    doc = loader.get_document(target_table_id)
+    if not doc:
+        raise HTTPException(status_code=500, detail="无法获取文档对象")
+
+    try:
+        # 保存到临时文件用于下载
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as tmp:
+            tmp_path = tmp.name
+
+        doc.save(tmp_path)
+
+        # 获取原始文件名
+        original_filename = table_info.filename
+        stem = Path(original_filename).stem
+        suffix = Path(original_filename).suffix or '.xlsx'
+        download_filename = f"{stem}_modified{suffix}"
+
+        # 读取文件内容
+        with open(tmp_path, 'rb') as f:
+            content = f.read()
+
+        # 清理临时文件
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+
+        # URL 编码文件名以支持中文
+        from urllib.parse import quote
+        encoded_filename = quote(download_filename, safe='')
+
+        # 返回文件下载响应
+        from fastapi.responses import Response
+        return Response(
+            content=content,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}",
+                "Content-Length": str(len(content)),
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"导出失败: {str(e)}")
+
+
 @app.post("/reset")
 async def reset():
     """重置 Agent 状态（清空所有表）"""
