@@ -164,16 +164,20 @@ async def stream_chat(message: str, history: list = None) -> AsyncGenerator[Dict
             error_str = str(e)
             last_error = e
 
-            # 检查是否是模型负载错误（500 错误且包含负载相关信息）
-            is_overload_error = (
+            # 检查是否是可重试的错误（模型负载、连接问题、空响应等）
+            is_retryable_error = (
                 "500" in error_str or
                 "负载" in error_str or
                 "overload" in error_str.lower() or
                 "capacity" in error_str.lower() or
-                "rate" in error_str.lower()
+                "rate" in error_str.lower() or
+                "no generations" in error_str.lower() or  # Gemini 空流响应
+                "empty" in error_str.lower() or
+                "timeout" in error_str.lower() or
+                "connection" in error_str.lower()
             )
 
-            if is_overload_error and model_idx < len(model_list) - 1:
+            if is_retryable_error and model_idx < len(model_list) - 1:
                 # 还有降级模型可用，继续尝试
                 print(f"[模型容错] {model_name} 不可用: {error_str[:100]}")
                 continue
@@ -262,7 +266,8 @@ async def _do_stream_chat(message: str, history: list, model_name: str) -> Async
 
     async for chunk in agent.astream(
         {"messages": messages},
-        stream_mode="messages"
+        stream_mode="messages",
+        config={"recursion_limit": 50}
     ):
         # chunk 是一个 tuple: (message, metadata)
         if isinstance(chunk, tuple) and len(chunk) >= 2:

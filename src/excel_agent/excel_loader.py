@@ -136,6 +136,34 @@ class ExcelLoader:
             "total_rows": len(self._df),
         }
     
+    def switch_sheet(self, sheet_name: str) -> Dict[str, Any]:
+        """切换到指定工作表
+
+        Args:
+            sheet_name: 目标工作表名称
+
+        Returns:
+            切换后的结构信息
+        """
+        if self._file_path is None:
+            raise ValueError("未加载 Excel 文件")
+
+        if sheet_name not in self._all_sheets:
+            raise ValueError(f"工作表 '{sheet_name}' 不存在，可用工作表: {self._all_sheets}")
+
+        if sheet_name == self._sheet_name:
+            return self.get_structure()
+
+        # 重新加载指定工作表
+        self._df = pd.read_excel(self._file_path, sheet_name=sheet_name)
+        self._sheet_name = sheet_name
+
+        return self.get_structure()
+
+    def get_all_sheets(self) -> List[str]:
+        """获取所有工作表名称"""
+        return self._all_sheets.copy()
+
     def get_summary(self) -> str:
         """获取 Excel 摘要信息（用于 Agent 上下文）"""
         if self._df is None:

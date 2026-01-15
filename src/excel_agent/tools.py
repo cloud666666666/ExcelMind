@@ -474,10 +474,10 @@ def get_unique_values(
 @tool
 def get_data_preview(n_rows: int = 10) -> Dict[str, Any]:
     """获取数据预览。
-    
+
     Args:
         n_rows: 预览行数，默认10行
-        
+
     Returns:
         数据预览
     """
@@ -486,6 +486,46 @@ def get_data_preview(n_rows: int = 10) -> Dict[str, Any]:
     if active_loader is None:
         return {"error": "没有活跃的表"}
     return active_loader.get_preview(n_rows)
+
+
+@tool
+def switch_sheet(sheet_name: str) -> Dict[str, Any]:
+    """切换当前活跃表的工作表（Sheet）。
+
+    Args:
+        sheet_name: 要切换到的工作表名称
+
+    Returns:
+        切换后的工作表结构信息，包含列信息和数据规模
+    """
+    loader = get_loader()
+    active_loader = loader.get_active_loader()
+
+    if active_loader is None:
+        return {"error": "没有活跃的表"}
+
+    try:
+        structure = active_loader.switch_sheet(sheet_name)
+
+        # 更新 MultiExcelLoader 中的表信息
+        active_info = loader.get_active_table_info()
+        if active_info:
+            active_info.sheet_name = structure["sheet_name"]
+            active_info.total_rows = structure["total_rows"]
+            active_info.total_columns = structure["total_columns"]
+
+        return {
+            "message": f"已切换到工作表: {sheet_name}",
+            "sheet_name": structure["sheet_name"],
+            "all_sheets": structure["all_sheets"],
+            "total_rows": structure["total_rows"],
+            "total_columns": structure["total_columns"],
+            "columns": [col["name"] for col in structure["columns"]],
+        }
+    except ValueError as e:
+        return {"error": str(e)}
+    except Exception as e:
+        return {"error": f"切换工作表失败: {str(e)}"}
 
 
 @tool
@@ -943,6 +983,7 @@ ALL_TOOLS = [
     get_column_stats,
     get_unique_values,
     get_data_preview,
+    switch_sheet,
     get_current_time,
     calculate,
     generate_chart,

@@ -20,6 +20,7 @@ SYSTEM_PROMPT = """你是一个专业的 Excel 数据分析助手。你的任务
 7. **get_unique_values**: 获取列的唯一值列表
 8. **calculate_expression**: 使用表达式进行列间计算
 9. **get_data_preview**: 获取数据预览
+10. **switch_sheet**: 切换到指定的工作表（Sheet）
 
 ## 工作原则
 
