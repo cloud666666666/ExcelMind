@@ -15,7 +15,7 @@ from .config import get_config
 from .excel_loader import get_loader
 from .knowledge_base import get_knowledge_base, format_knowledge_context
 from .tools import ALL_TOOLS
-from .skills import get_skill_manager
+from .skill_loader import get_skill_loader
 
 
 # 当前使用的模型名称（用于容错切换后的显示）
@@ -77,8 +77,8 @@ SYSTEM_PROMPT = """你是一个专业的 Excel 数据分析助手。
 
 
 # 是否启用 Skills 动态路由（可通过配置控制）
-# 设为 False 让 LLM 自己判断使用哪些工具，而不是通过关键词预筛选
-ENABLE_SKILL_ROUTING = False
+# 设为 True 启用技能扫描和匹配日志
+ENABLE_SKILL_ROUTING = True
 
 
 def create_llm_for_model(model_name: str):
@@ -260,26 +260,43 @@ async def _do_stream_chat(message: str, history: list, model_name: str) -> Async
     else:
         print("[知识库] 未启用或初始化失败")
 
-    # Skills 动态路由
+    # Skills 动态路由（使用新的 SkillLoader）
     skills_context = "所有数据分析工具均可用。"
     active_tools = ALL_TOOLS  # 默认使用所有工具
 
     if ENABLE_SKILL_ROUTING:
         try:
-            skill_manager = get_skill_manager()
-            resolved_skills = skill_manager.resolve(message, top_k=5, threshold=0.25)
+            skill_loader = get_skill_loader()
 
-            if resolved_skills:
-                active_tools = skill_manager.get_active_tools()
-                skill_names = [s.display_name for s in resolved_skills]
+            # 输出技能列表（用于系统提示，节省 token）
+            skill_list_prompt = skill_loader.get_skill_list_for_prompt()
+            summary = skill_loader.get_skills_summary()
+            print(f"\n[Skills] 可用技能: {summary['total']} 个 (核心: {summary['core']}, 按需: {summary['on_demand']}, 系统: {summary['system']})")
+
+            # 激活与查询相关的技能（会输出详细匹配日志）
+            activated_skills = skill_loader.activate_skills_for_query(message, top_k=5, threshold=0.25)
+
+            if activated_skills:
+                active_tools = skill_loader.get_active_tools()
+                skill_names = skill_loader.get_active_skill_names()
+
+                # 使用紧凑的技能列表格式（节省 token）
                 skills_context = f"已激活技能: {', '.join(skill_names)}\n"
-                skills_context += skill_manager.get_system_prompt_additions()
+                skills_context += skill_loader.get_system_prompt_additions()
 
                 yield {"type": "thinking", "content": f"激活技能: {', '.join(skill_names)}"}
-                print(f"[Skills] 激活: {skill_names}, 工具数: {len(active_tools)}")
+
+                # 输出激活结果摘要
+                print(f"\n[Skills] ✅ 最终激活: {skill_names}")
+                print(f"[Skills] 🔧 可用工具数: {len(active_tools)}")
         except Exception as e:
-            print(f"[Skills] 路由失败，使用全部工具: {e}")
+            print(f"[Skills] ❌ 路由失败，使用全部工具: {e}")
+            import traceback
+            traceback.print_exc()
             active_tools = ALL_TOOLS
+    else:
+        # 未启用技能路由时，也输出一条日志
+        print(f"\n[Skills] ⏸️  技能路由未启用，使用全部 {len(ALL_TOOLS)} 个工具")
 
     # 构建系统提示
     system_prompt = SYSTEM_PROMPT.format(

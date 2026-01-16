@@ -1,9 +1,10 @@
 """Excel 智能问数 Agent
 
 v2.0: 支持双引擎模式 (pandas + openpyxl) 和 Skills 动态路由
+v2.1: 新增 Claude Code 风格的技能扫描系统
 """
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 from .excel_document import ExcelDocument, Change, ChangeType
 from .excel_loader import (
@@ -19,11 +20,24 @@ from .skill_manager import (
     SkillCategory,
     IntentMatch,
 )
-from .skills import (
-    get_skill_manager,
-    reset_skill_manager,
-    create_skill_manager,
-    register_builtin_skills,
+from .skill_scanner import (
+    SkillScanner,
+    SkillMetadata,
+    SkillFileContent,
+    get_skill_scanner,
+    reset_skill_scanner,
+)
+from .skill_loader import (
+    SkillLoader,
+    get_skill_loader,
+    reset_skill_loader,
+    build_tools_registry,
+)
+from .tools import (
+    get_tools_registry,
+    get_tools_by_names,
+    ALL_TOOLS,
+    SKILL_TOOLS,
 )
 
 __all__ = [
@@ -36,13 +50,24 @@ __all__ = [
     "ChangeType",
     "get_loader",
     "reset_loader",
-    # Skills
+    # Skills 管理
     "SkillManager",
     "SkillDefinition",
     "SkillCategory",
     "IntentMatch",
-    "get_skill_manager",
-    "reset_skill_manager",
-    "create_skill_manager",
-    "register_builtin_skills",
+    # Skills 扫描（Claude Code 风格）
+    "SkillScanner",
+    "SkillMetadata",
+    "SkillFileContent",
+    "get_skill_scanner",
+    "reset_skill_scanner",
+    "SkillLoader",
+    "get_skill_loader",
+    "reset_skill_loader",
+    "build_tools_registry",
+    # 工具
+    "get_tools_registry",
+    "get_tools_by_names",
+    "ALL_TOOLS",
+    "SKILL_TOOLS",
 ]
