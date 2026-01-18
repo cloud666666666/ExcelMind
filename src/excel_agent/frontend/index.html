@@ -1646,10 +1646,10 @@
         <div class="upload-section">
             <div class="upload-zone" id="upload-zone">
                 <div class="upload-icon">📁</div>
-                <p class="upload-text">拖拽或点击上传 Excel</p>
+                <p class="upload-text">拖拽或点击上传 Excel / CSV</p>
                 <p class="upload-hint">支持多个文件</p>
             </div>
-            <input type="file" id="file-input" accept=".xlsx,.xls,.xlsm" multiple>
+            <input type="file" id="file-input" accept=".xlsx,.xls,.xlsm,.csv" multiple>
         </div>
 
         <div class="tables-section">
@@ -1936,7 +1936,7 @@
         async function handleFiles(files) {
             const validFiles = Array.from(files).filter(f => {
                 const ext = '.' + f.name.split('.').pop().toLowerCase();
-                return ['.xlsx', '.xls', '.xlsm'].includes(ext);
+                return ['.xlsx', '.xls', '.xlsm', '.csv'].includes(ext);
             });
 
             if (validFiles.length === 0) return;

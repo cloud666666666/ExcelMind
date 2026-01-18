@@ -6,7 +6,7 @@
 
 ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解自然语言并智能分析数据。支持多轮对话、流式输出、ECharts 图表可视化和完整的思考过程展示，让数据分析变得简单直观。
 
-> 🔱 **Fork 声明**：本项目基于 [Gen-Future/ExcelMind](https://github.com/Gen-Future/ExcelMind) 进行二次开发，新增了 **Claude 系列模型原生适配**、**模型调用失败的容错降级机制** 以及 **v2.0 写入能力**。
+> 🔱 **Fork 声明**：本项目基于 [Gen-Future/ExcelMind](https://github.com/Gen-Future/ExcelMind) 进行二次开发，新增了 **Claude 系列模型原生适配**、**模型调用失败的容错降级机制**、**v2.0 写入能力** 以及 **CSV 文件支持**。
 
 ![Python](https://img.shields.io/badge/Python-3.11+-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
@@ -85,6 +85,7 @@ ExcelMind 是一个专为 Excel 数据分析设计的 AI 助手，能够理解�
 ### 🔧 高级特性
 
 - **多表协同** - 同时管理多个 Excel 表格，支持智能联表
+- **CSV 支持** - 完整支持 CSV 文件的加载、分析和导出
 - **本地知识库** - 基于 Chroma 向量数据库的私有知识存储
 - **双主题模式** - 亮色/暗色主题一键切换
 - **意图过滤** - 自动拒绝与数据无关的闲聊
@@ -224,8 +225,9 @@ export OPENAI_BASE_URL="your-api-base-url"
 
 ### 1. 上传文件
 
-- 拖拽 Excel 文件到页面
+- 拖拽 Excel 或 CSV 文件到页面
 - 或点击上传区域选择文件
+- 支持 `.xlsx`、`.xls`、`.xlsm`、`.csv` 格式
 - 支持同时上传多个文件
 
 ### 2. 开始对话
@@ -262,9 +264,9 @@ v2.0 支持通过自然语言修改 Excel 数据：
 
 | 接口             | 方法 | 描述               |
 | ---------------- | ---- | ------------------ |
-| `/`            | GET  | Web 界面           |
-| `/upload`      | POST | 上传 Excel 文件    |
-| `/load`        | POST | 通过路径加载 Excel |
+| `/`            | GET  | Web 界面              |
+| `/upload`      | POST | 上传 Excel/CSV 文件   |
+| `/load`        | POST | 通过路径加载 Excel/CSV |
 | `/chat/stream` | POST | 流式对话（推荐）   |
 | `/chat`        | POST | 非流式对话         |
 | `/download`    | GET  | 下载修改后的文件   |
@@ -274,9 +276,9 @@ v2.0 支持通过自然语言修改 Excel 数据：
 ### 请求示例
 
 ```bash
-# 上传 Excel
+# 上传 Excel 或 CSV
 curl -X POST "http://localhost:8000/upload" \
-  -F "file=@your_file.xlsx"
+  -F "file=@your_file.xlsx"   # 或 your_file.csv
 
 # 流式对话
 curl -X POST "http://localhost:8000/chat/stream" \
@@ -308,11 +310,11 @@ curl -O "http://localhost:8000/download"
 - ✅ 检查 `base_url` 是否可访问
 - ✅ 检查网络代理设置
 
-### Q3: Excel 文件上传失败
+### Q3: 文件上传失败
 
 **A: 文件问题**
 
-- ✅ 确保文件格式为 `.xlsx` 或 `.xls`
+- ✅ 确保文件格式为 `.xlsx`、`.xls`、`.xlsm` 或 `.csv`
 - ✅ 检查文件是否损坏
 - ✅ 检查文件大小是否过大
 
@@ -375,7 +377,14 @@ uv run ruff format .
 
 ## 📝 更新日志
 
-### v2.0.0 (当前版本)
+### v2.1.0 (当前版本)
+
+- ✅ **CSV 文件支持**: 完整支持 CSV 文件的加载、分析和导出
+  - 支持 `.csv` 格式文件上传和拖拽
+  - CSV 文件自动转换为内部工作表处理
+  - 支持导出为 CSV 或 Excel 格式
+
+### v2.0.0
 
 - ✅ **双引擎架构**: pandas（分析）+ openpyxl（写入）
 - ✅ **写入能力**: 单元格写入、批量写入、公式写入

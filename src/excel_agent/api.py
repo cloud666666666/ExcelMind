@@ -324,21 +324,21 @@ async def suggest_join(request: SuggestJoinRequest):
 
 @app.post("/load", response_model=LoadExcelResponse)
 async def load_excel(request: LoadExcelRequest):
-    """通过文件路径加载 Excel 文件（追加模式）"""
+    """通过文件路径加载 Excel/CSV 文件（追加模式）"""
     try:
         loader = get_loader()
         table_id, structure = loader.add_table(request.file_path, request.sheet_name)
-        
+
         # 获取预览
         active_loader = loader.get_active_loader()
         preview = active_loader.get_preview() if active_loader else None
-        
+
         # 重置图以使用新的 Excel 数据
         reset_graph()
-        
+
         return LoadExcelResponse(
             success=True,
-            message=f"成功加载 Excel 文件: {request.file_path}",
+            message=f"成功加载文件: {request.file_path}",
             table_id=table_id,
             structure=structure,
             preview=preview,
@@ -354,14 +354,14 @@ async def load_excel(request: LoadExcelRequest):
 
 @app.post("/upload", response_model=LoadExcelResponse)
 async def upload_excel(file: UploadFile = File(...), sheet_name: Optional[str] = None):
-    """上传 Excel 文件（追加模式，会添加到多表管理器）"""
+    """上传 Excel/CSV 文件（追加模式，会添加到多表管理器）"""
     if not file.filename:
         raise HTTPException(status_code=400, detail="未提供文件")
-    
+
     # 检查文件扩展名
     suffix = Path(file.filename).suffix.lower()
-    if suffix not in ['.xlsx', '.xls', '.xlsm']:
-        raise HTTPException(status_code=400, detail=f"不支持的文件格式: {suffix}")
+    if suffix not in ['.xlsx', '.xls', '.xlsm', '.csv']:
+        raise HTTPException(status_code=400, detail=f"不支持的文件格式: {suffix}，支持 .xlsx, .xls, .xlsm, .csv")
     
     try:
         # 保存到临时文件
@@ -388,7 +388,7 @@ async def upload_excel(file: UploadFile = File(...), sheet_name: Optional[str] =
         
         return LoadExcelResponse(
             success=True,
-            message=f"成功上传并加载 Excel 文件: {file.filename}",
+            message=f"成功上传并加载文件: {file.filename}",
             table_id=table_id,
             structure=structure,
             preview=preview,

@@ -55,37 +55,44 @@ class ExcelLoader:
         return self._df
     
     def load(self, file_path: str, sheet_name: Optional[str] = None) -> Dict[str, Any]:
-        """加载 Excel 文件
-        
+        """加载 Excel 或 CSV 文件
+
         Args:
-            file_path: Excel 文件路径
-            sheet_name: 工作表名称，默认加载第一个
-            
+            file_path: Excel/CSV 文件路径
+            sheet_name: 工作表名称，默认加载第一个（CSV 文件忽略此参数）
+
         Returns:
             文件结构信息
         """
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"文件不存在: {file_path}")
-        
-        if path.suffix.lower() not in ['.xlsx', '.xls', '.xlsm']:
-            raise ValueError(f"不支持的文件格式: {path.suffix}")
-        
-        # 获取所有工作表名称
-        xlsx = pd.ExcelFile(file_path)
-        self._all_sheets = xlsx.sheet_names
-        
-        # 确定要加载的工作表
-        if sheet_name is None:
-            sheet_name = self._all_sheets[0]
-        elif sheet_name not in self._all_sheets:
-            raise ValueError(f"工作表 '{sheet_name}' 不存在，可用工作表: {self._all_sheets}")
-        
-        # 加载数据
-        self._df = pd.read_excel(file_path, sheet_name=sheet_name)
+
+        suffix = path.suffix.lower()
+        if suffix not in ['.xlsx', '.xls', '.xlsm', '.csv']:
+            raise ValueError(f"不支持的文件格式: {path.suffix}，支持 .xlsx, .xls, .xlsm, .csv")
+
+        if suffix == '.csv':
+            # CSV 文件处理：没有工作表概念，使用虚拟 sheet 名
+            self._all_sheets = ['Sheet1']
+            self._df = pd.read_csv(file_path, encoding='utf-8')
+            self._sheet_name = 'Sheet1'
+        else:
+            # Excel 文件处理
+            xlsx = pd.ExcelFile(file_path)
+            self._all_sheets = xlsx.sheet_names
+
+            # 确定要加载的工作表
+            if sheet_name is None:
+                sheet_name = self._all_sheets[0]
+            elif sheet_name not in self._all_sheets:
+                raise ValueError(f"工作表 '{sheet_name}' 不存在，可用工作表: {self._all_sheets}")
+
+            self._df = pd.read_excel(file_path, sheet_name=sheet_name)
+            self._sheet_name = sheet_name
+
         self._file_path = file_path
-        self._sheet_name = sheet_name
-        
+
         return self.get_structure()
     
     def get_structure(self) -> Dict[str, Any]:

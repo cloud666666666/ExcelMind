@@ -64,6 +64,7 @@ class ExcelDocument:
         self._file_path: Optional[str] = None
         self._active_sheet: Optional[str] = None
         self._all_sheets: List[str] = []
+        self._is_csv: bool = False  # 是否为 CSV 文件
 
         # 状态追踪
         self._is_dirty: bool = False
@@ -155,11 +156,11 @@ class ExcelDocument:
     # ==================== 加载与保存 ====================
 
     def load(self, file_path: str, sheet_name: Optional[str] = None) -> Dict[str, Any]:
-        """加载 Excel 文件
+        """加载 Excel 或 CSV 文件
 
         Args:
-            file_path: Excel 文件路径
-            sheet_name: 工作表名称，默认加载第一个
+            file_path: Excel/CSV 文件路径
+            sheet_name: 工作表名称，默认加载第一个（CSV 文件忽略此参数）
 
         Returns:
             文件结构信息
@@ -168,21 +169,39 @@ class ExcelDocument:
         if not path.exists():
             raise FileNotFoundError(f"文件不存在: {file_path}")
 
-        if path.suffix.lower() not in ['.xlsx', '.xlsm']:
-            raise ValueError(f"不支持的文件格式: {path.suffix}，仅支持 .xlsx 和 .xlsm")
+        suffix = path.suffix.lower()
+        if suffix not in ['.xlsx', '.xlsm', '.csv']:
+            raise ValueError(f"不支持的文件格式: {path.suffix}，仅支持 .xlsx, .xlsm, .csv")
 
-        # 加载 openpyxl Workbook (保留公式)
-        self._workbook = load_workbook(file_path, data_only=False)
         self._file_path = str(path.absolute())
-        self._all_sheets = self._workbook.sheetnames
+        self._is_csv = suffix == '.csv'
 
-        # 确定活跃工作表
-        if sheet_name is None:
-            self._active_sheet = self._all_sheets[0]
-        elif sheet_name not in self._all_sheets:
-            raise ValueError(f"工作表 '{sheet_name}' 不存在，可用: {self._all_sheets}")
+        if suffix == '.csv':
+            # CSV 文件处理：创建一个新的 Workbook 并导入数据
+            df = pd.read_csv(file_path, encoding='utf-8')
+            self._workbook = Workbook()
+            ws = self._workbook.active
+            ws.title = 'Sheet1'
+
+            # 将 DataFrame 数据写入 Worksheet
+            for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=True), 1):
+                for c_idx, value in enumerate(row, 1):
+                    ws.cell(row=r_idx, column=c_idx, value=value)
+
+            self._all_sheets = ['Sheet1']
+            self._active_sheet = 'Sheet1'
         else:
-            self._active_sheet = sheet_name
+            # Excel 文件处理
+            self._workbook = load_workbook(file_path, data_only=False)
+            self._all_sheets = self._workbook.sheetnames
+
+            # 确定活跃工作表
+            if sheet_name is None:
+                self._active_sheet = self._all_sheets[0]
+            elif sheet_name not in self._all_sheets:
+                raise ValueError(f"工作表 '{sheet_name}' 不存在，可用: {self._all_sheets}")
+            else:
+                self._active_sheet = sheet_name
 
         # 初始加载当前工作表到 DataFrame
         self._load_sheet_to_df(self._active_sheet)
@@ -200,6 +219,8 @@ class ExcelDocument:
 
         Args:
             file_path: 保存路径，默认覆盖原文件
+                      如果原文件是 CSV 且未指定路径，将保存为同名 .xlsx 文件
+                      如果指定 .csv 后缀，将导出为 CSV 格式
 
         Returns:
             保存的文件路径
@@ -211,17 +232,32 @@ class ExcelDocument:
         if not save_path:
             raise ValueError("未指定保存路径")
 
-        self._workbook.save(save_path)
+        save_path = Path(save_path)
+        suffix = save_path.suffix.lower()
 
-        # 如果是另存为，更新文件路径
+        # 如果原文件是 CSV 且没有指定新路径，默认保存为 xlsx
+        if self._is_csv and file_path is None:
+            save_path = save_path.with_suffix('.xlsx')
+            suffix = '.xlsx'
+
+        if suffix == '.csv':
+            # 保存为 CSV 格式（只保存当前活跃工作表）
+            df = self.dataframe
+            df.to_csv(str(save_path), index=False, encoding='utf-8')
+        else:
+            # 保存为 Excel 格式
+            self._workbook.save(str(save_path))
+
+        # 如果是另存为，更新文件路径和状态
         if file_path:
-            self._file_path = str(Path(file_path).absolute())
+            self._file_path = str(save_path.absolute())
+            self._is_csv = suffix == '.csv'
 
         # 重置 dirty 状态
         self._is_dirty = False
         self._dirty_sheets.clear()
 
-        return save_path
+        return str(save_path)
 
     def save_as(self, file_path: str) -> str:
         """另存为
